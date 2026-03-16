@@ -1,0 +1,12 @@
+{
+  "manifest_version": 3,
+  "name": "Pay Day New Tab",
+  "version": "1.0.0",
+  "description": "A custom Chrome New Tab dashboard with a live clock and recurring payday countdown.",
+  "permissions": [
+    "storage"
+  ],
+  "chrome_url_overrides": {
+    "newtab": "newtab.html"
+  }
+}

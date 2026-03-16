@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>New Tab</title>
+    <link rel="stylesheet" href="newtab-themes.css" />
+    <link rel="stylesheet" href="newtab.css" />
+  </head>
+  <body>
+    <button
+      id="settings-toggle"
+      class="icon-button settings-toggle"
+      type="button"
+      aria-label="Open settings"
+      aria-expanded="false"
+      aria-controls="settings-panel"
+    >
+      <span aria-hidden="true">⚙</span>
+    </button>
+
+    <main class="shell">
+      <section
+        id="hero-panel"
+        class="panel hero-panel"
+        aria-label="Current time and payday countdown"
+      >
+        <div class="hero-content">
+          <h1 id="clock" class="clock" aria-live="polite">00:00:00</h1>
+          <p id="date-label" class="date-label">Loading date…</p>
+
+          <div class="headline-wrap">
+            <p id="payday-status" class="payday-status">0 days left</p>
+            <p id="payday-target" class="payday-target">Next payday: --</p>
+          </div>
+
+          <section
+            id="countdown"
+            class="countdown"
+            aria-label="Detailed payday countdown"
+          >
+            <article class="countdown-card">
+              <span id="days-value" class="countdown-value">0</span>
+              <span class="countdown-label">Days</span>
+            </article>
+            <article class="countdown-card">
+              <span id="hours-value" class="countdown-value">0</span>
+              <span class="countdown-label">Hours</span>
+            </article>
+            <article class="countdown-card">
+              <span id="minutes-value" class="countdown-value">0</span>
+              <span class="countdown-label">Minutes</span>
+            </article>
+            <article id="seconds-card" class="countdown-card">
+              <span id="seconds-value" class="countdown-value">0</span>
+              <span class="countdown-label">Seconds</span>
+            </article>
+          </section>
+        </div>
+      </section>
+
+      <aside
+        id="settings-panel"
+        class="panel settings-panel"
+        aria-label="Payday settings"
+        hidden
+      >
+        <p class="settings-title">Settings</p>
+        <form id="settings-form" class="settings-form">
+          <label class="field-label" for="payday-input">Recurring payday day</label>
+          <div class="field-row">
+            <input
+              id="payday-input"
+              class="payday-input"
+              name="payday"
+              type="number"
+              min="1"
+              max="31"
+              inputmode="numeric"
+              required
+            />
+            <button class="save-button" type="submit">Save</button>
+          </div>
+          <p class="helper-text">
+            Values above the last day of a month automatically clamp to that month’s final valid date.
+          </p>
+          <div class="clock-size-control" aria-label="Clock font size controls">
+            <span class="field-label">Clock size</span>
+            <div class="size-control-row">
+              <button
+                id="clock-size-down"
+                class="icon-button size-button"
+                type="button"
+                aria-label="Decrease clock size"
+              >
+                -
+              </button>
+              <span id="clock-size-label" class="size-label" aria-live="polite">100%</span>
+              <button
+                id="clock-size-up"
+                class="icon-button size-button"
+                type="button"
+                aria-label="Increase clock size"
+              >
+                +
+              </button>
+            </div>
+          </div>
+          <button
+            id="seconds-toggle"
+            class="icon-button theme-toggle"
+            type="button"
+            aria-label="Toggle seconds visibility"
+          >
+            Hide seconds
+          </button>
+          <button
+            id="theme-toggle"
+            class="icon-button theme-toggle"
+            type="button"
+            aria-label="Toggle dark mode"
+          >
+            Dark mode
+          </button>
+          <button
+            id="palette-randomize"
+            class="icon-button theme-toggle"
+            type="button"
+            aria-label="Randomize theme colors"
+          >
+            Randomize colors
+          </button>
+          <p id="save-message" class="save-message" aria-live="polite"></p>
+        </form>
+      </aside>
+    </main>
+
+    <script src="newtab.js"></script>
+  </body>
+</html>
