@@ -20,24 +20,60 @@
     </button>
 
     <main class="shell">
+      <div
+        id="theme-customize-popup"
+        class="popup"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="popup-title"
+        hidden
+      >
+        <div class="popup-content">
+          <h2 id="popup-title">Customize Theme</h2>
+          <div class="popup-body">
+            <label class="field-label" for="theme-hue-slider">Hue</label>
+            <div class="slider-container">
+              <input id="theme-hue-slider" type="range" min="0" max="359" value="0" />
+              <span id="theme-hue-value">0 deg</span>
+            </div>
+            <div class="popup-actions">
+              <button id="theme-apply-btn" class="save-button" type="button">Apply</button>
+              <button
+                id="theme-cancel-btn"
+                class="icon-button popup-close-button"
+                type="button"
+                aria-label="Close popup"
+              >
+                <span aria-hidden="true">×</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
       <section
         id="hero-panel"
         class="panel hero-panel"
-        aria-label="Current time and payday countdown"
+        aria-label="Current time, bookmarks, and payday countdown"
       >
         <div class="hero-content">
           <h1 id="clock" class="clock" aria-live="polite">00:00:00</h1>
           <p id="date-label" class="date-label">Loading date…</p>
 
-          <div class="headline-wrap">
-            <p id="payday-status" class="payday-status">0 days left</p>
-            <p id="payday-target" class="payday-target">Next payday: --</p>
-          </div>
+          <section id="bookmarks-section" class="bookmarks-section" aria-label="Bookmarks">
+            <p class="section-title">Bookmarks</p>
+            <div id="bookmarks-root-links" class="bookmark-link-list" aria-label="Top-level bookmarks"></div>
+            <div id="bookmarks-folders" class="bookmark-folder-grid" aria-label="Bookmark folders"></div>
+            <p id="bookmarks-message" class="bookmarks-message" aria-live="polite"></p>
+          </section>
+
+          <p id="payday-status" class="payday-status">0 days till payday</p>
+          <p id="payday-target" class="payday-target">Next payday: --</p>
 
           <section
             id="countdown"
             class="countdown"
             aria-label="Detailed payday countdown"
+            hidden
           >
             <article class="countdown-card">
               <span id="days-value" class="countdown-value">0</span>
@@ -122,19 +158,45 @@
           >
             Dark mode
           </button>
-          <button
-            id="palette-randomize"
-            class="icon-button theme-toggle"
-            type="button"
-            aria-label="Randomize theme colors"
-          >
-            Randomize colors
-          </button>
+          <div class="palette-nav" aria-label="Theme navigation">
+            <button
+              id="palette-prev"
+              class="icon-button theme-toggle"
+              type="button"
+              aria-label="Previous theme"
+            >
+              Previous
+            </button>
+            <button
+              id="palette-next"
+              class="icon-button theme-toggle"
+              type="button"
+              aria-label="Next theme"
+            >
+              Next
+            </button>
+            <button
+              id="randomize-theme"
+              class="icon-button theme-toggle"
+              type="button"
+              aria-label="Randomize theme colors"
+            >
+              Randomize
+            </button>
+            <button
+              id="customize-theme"
+              class="icon-button theme-toggle"
+              type="button"
+              aria-label="Customize theme"
+            >
+              Customize
+            </button>
+          </div>
           <p id="save-message" class="save-message" aria-live="polite"></p>
         </form>
       </aside>
     </main>
 
-    <script src="newtab.js"></script>
+    <script type="module" src="newtab.js"></script>
   </body>
 </html>
