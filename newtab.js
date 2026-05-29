@@ -1,23 +1,31 @@
 import {
   appState,
   DEFAULT_CLOCK_SIZE_STEP,
+  DEFAULT_CUSTOM_COUNTDOWN_DAYS,
+  DEFAULT_CUSTOM_COUNTDOWN_TEXT,
   DEFAULT_DYNAMIC_HUE,
   DEFAULT_HIDE_SECONDS,
   DEFAULT_IS_DYNAMIC_THEME,
   DEFAULT_PAYDAY,
   DEFAULT_THEME,
+  DEFAULT_WEATHER_CITY,
   elements,
   storage
 } from "./js/shared.js";
 import {
   clampPaydayDay,
+  createCustomCountdownTargetMs,
   normalizeHideSeconds,
+  normalizeCustomCountdownDays,
+  normalizeCustomCountdownText,
   renderClockAndCountdown,
   renderSecondsVisibility,
   savePaydayDay,
+  saveCustomCountdown,
   toggleSecondsVisibility
 } from "./js/clock.js";
 import { loadAndRenderBookmarks } from "./js/bookmarks.js";
+import { initWeather, setWeatherCity } from "./js/weather.js";
 import {
   adjustClockSize,
   applyDynamicTheme,
@@ -93,7 +101,11 @@ async function initialize() {
     "clockSizeStep",
     "hideSeconds",
     "isDynamicTheme",
-    "dynamicHue"
+    "dynamicHue",
+    "customCountdownDays",
+    "customCountdownText",
+    "customCountdownTargetMs",
+    "weatherCity"
   ]);
 
   appState.paydayDay = clampPaydayDay(saved.paydayDay ?? DEFAULT_PAYDAY);
@@ -104,8 +116,23 @@ async function initialize() {
   appState.hideSeconds = normalizeHideSeconds(saved.hideSeconds ?? DEFAULT_HIDE_SECONDS);
   appState.isDynamicTheme = saved.isDynamicTheme === true ? true : DEFAULT_IS_DYNAMIC_THEME;
   appState.dynamicHue = normalizeDynamicHue(saved.dynamicHue, DEFAULT_DYNAMIC_HUE);
+  appState.customCountdownDays = normalizeCustomCountdownDays(saved.customCountdownDays ?? DEFAULT_CUSTOM_COUNTDOWN_DAYS);
+  appState.customCountdownText = normalizeCustomCountdownText(saved.customCountdownText ?? DEFAULT_CUSTOM_COUNTDOWN_TEXT);
+  appState.weatherCity = saved.weatherCity || DEFAULT_WEATHER_CITY;
+  const customCountdownTargetMs = Number.parseInt(saved.customCountdownTargetMs, 10);
+  appState.customCountdownTargetMs =
+    Number.isFinite(customCountdownTargetMs) && customCountdownTargetMs > 0
+      ? customCountdownTargetMs
+      : createCustomCountdownTargetMs(appState.customCountdownDays);
 
   elements.paydayInput.value = String(appState.paydayDay);
+  elements.customCountdownDaysInput.value = String(appState.customCountdownDays);
+  elements.customCountdownTextInput.value = appState.customCountdownText;
+  elements.weatherCityInput.value = appState.weatherCity;
+
+  if (!Number.isFinite(customCountdownTargetMs) || customCountdownTargetMs <= 0) {
+    await storage.set({ customCountdownTargetMs: appState.customCountdownTargetMs });
+  }
   renderTheme(appState.theme);
   renderPalette();
 
@@ -121,10 +148,19 @@ async function initialize() {
   renderSettingsPanel();
   renderClockAndCountdown();
   await loadAndRenderBookmarks();
+  initWeather();
 
   elements.settingsForm.addEventListener("submit", async (event) => {
     event.preventDefault();
     await savePaydayDay(elements.paydayInput.value);
+    await saveCustomCountdown(
+      elements.customCountdownDaysInput.value,
+      elements.customCountdownTextInput.value
+    );
+    const newCity = elements.weatherCityInput.value.trim() || DEFAULT_WEATHER_CITY;
+    appState.weatherCity = newCity;
+    await storage.set({ weatherCity: newCity });
+    setWeatherCity();
   });
 
   elements.settingsToggle.addEventListener("click", () => {

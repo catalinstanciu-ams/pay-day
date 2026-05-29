@@ -125,7 +125,7 @@ body::before {
 .hero-content {
   width: min(1200px, 100%);
   display: grid;
-  gap: 22px;
+  gap: 8px;
   align-items: start;
   text-align: center;
 }
@@ -181,14 +181,96 @@ body[data-clock-font="4"] .clock {
   color: color-mix(in srgb, var(--text-muted) 82%, var(--accent) 18%);
 }
 
-.section-title {
-  margin: 0;
-  text-align: left;
-  text-transform: uppercase;
-  letter-spacing: 0.16em;
-  font-size: 0.78rem;
+.hero-top {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 32px;
+  width: 100%;
+}
+
+.time-block {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 18px;
+}
+
+.weather-block {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+}
+
+.weather-icon {
+  font-size: 4.4rem;
+  line-height: 1;
+}
+
+.weather-temp {
   font-weight: 700;
-  color: color-mix(in srgb, var(--text-soft) 72%, var(--accent) 28%);
+  font-size: 3rem;
+  color: var(--text-main);
+  font-variant-numeric: tabular-nums;
+}
+
+.weather-desc {
+  font-size: 1.8rem;
+  color: var(--text-muted);
+}
+
+.weather-forecast {
+  display: flex;
+  gap: 6px;
+  justify-content: center;
+}
+
+.forecast-day {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 6px 10px;
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--card-bg) 55%, transparent);
+  border: 1px solid color-mix(in srgb, var(--card-border) 55%, transparent);
+  min-width: 60px;
+}
+
+.forecast-day-name {
+  font-weight: 600;
+  font-size: 0.875rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-muted);
+}
+
+.forecast-icon {
+  font-size: 1.4375rem;
+  line-height: 1;
+}
+
+.forecast-temps {
+  display: flex;
+  gap: 4px;
+  font-variant-numeric: tabular-nums;
+  font-size: 1rem;
+}
+
+.forecast-high {
+  font-weight: 700;
+  color: var(--text-main);
+}
+
+.forecast-low {
+  color: var(--text-muted);
+}
+
+.counters-block {
+  display: grid;
+  gap: 4px;
+  text-align: right;
 }
 
 .bookmarks-section {
@@ -517,6 +599,60 @@ body[data-clock-font="4"] .clock {
 
   .bookmark-folder-grid {
     grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .hero-top {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .counters-block {
+    text-align: center;
+  }
+
+  .time-block {
+    gap: 10px;
+  }
+
+  .weather-desc {
+    display: none;
+  }
+}
+
+@media (max-width: 480px) {
+.weather-column {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.weather-block {
+    display: none;
+  }
+
+  .weather-forecast {
+    gap: 4px;
+  }
+
+  .forecast-day {
+    padding: 4px 6px;
+    min-width: 50px;
+  }
+
+  .forecast-day-name {
+    font-size: 0.65rem;
+  }
+
+  .forecast-icon {
+    font-size: 1rem;
+  }
+
+  .forecast-temps {
+    font-size: 0.7rem;
   }
 }
 

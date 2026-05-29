@@ -1,5 +1,7 @@
 import {
   appState,
+  DEFAULT_CUSTOM_COUNTDOWN_DAYS,
+  DEFAULT_CUSTOM_COUNTDOWN_TEXT,
   DEFAULT_HIDE_SECONDS,
   DEFAULT_PAYDAY,
   elements,
@@ -34,6 +36,10 @@ function getCountdownParts(diffMs) {
   const seconds = totalSeconds % 60;
 
   return { days, hours, minutes, seconds };
+}
+
+export function createCustomCountdownTargetMs(days, baseTimeMs = Date.now()) {
+  return baseTimeMs + normalizeCustomCountdownDays(days) * 86400000;
 }
 
 function getPaydayState(now, paydayDay) {
@@ -101,6 +107,7 @@ export function renderClockAndCountdown() {
   const now = new Date();
   renderClock(now);
   renderCountdown(now);
+  renderCustomCountdown(now);
 }
 
 export async function savePaydayDay(day) {
@@ -109,6 +116,27 @@ export async function savePaydayDay(day) {
   elements.paydayInput.value = String(paydayDay);
   await storage.set({ paydayDay });
   setSaveMessage(`Saved recurring payday as day ${paydayDay}.`);
+  renderClockAndCountdown();
+}
+
+export async function saveCustomCountdown(days, text) {
+  const customDays = normalizeCustomCountdownDays(days);
+  const customText = normalizeCustomCountdownText(text);
+  const customCountdownTargetMs = createCustomCountdownTargetMs(customDays);
+
+  appState.customCountdownDays = customDays;
+  appState.customCountdownText = customText;
+  appState.customCountdownTargetMs = customCountdownTargetMs;
+
+  elements.customCountdownDaysInput.value = String(customDays);
+  elements.customCountdownTextInput.value = customText;
+
+  await storage.set({
+    customCountdownDays: customDays,
+    customCountdownText: customText,
+    customCountdownTargetMs
+  });
+  setSaveMessage(`Saved custom countdown: ${customDays} days till ${customText}.`);
   renderClockAndCountdown();
 }
 
@@ -122,4 +150,28 @@ export async function toggleSecondsVisibility() {
 
 export function normalizeHideSeconds(value) {
   return Boolean(value ?? DEFAULT_HIDE_SECONDS);
+}
+
+export function normalizeCustomCountdownDays(value) {
+  const numericDays = Number.parseInt(value, 10);
+  if (Number.isNaN(numericDays)) {
+    return DEFAULT_CUSTOM_COUNTDOWN_DAYS;
+  }
+  return Math.min(365, Math.max(1, numericDays));
+}
+
+export function normalizeCustomCountdownText(value) {
+  const text = String(value).trim();
+  return text || DEFAULT_CUSTOM_COUNTDOWN_TEXT;
+}
+
+export function renderCustomCountdown(now) {
+  if (!Number.isFinite(appState.customCountdownTargetMs) || appState.customCountdownTargetMs <= 0) {
+    appState.customCountdownTargetMs = createCustomCountdownTargetMs(appState.customCountdownDays, now.getTime());
+  }
+
+  const diffMs = appState.customCountdownTargetMs - now.getTime();
+  const countdown = getCountdownParts(diffMs);
+
+  elements.customCountdownStatus.textContent = `${countdown.days} day${countdown.days === 1 ? "" : "s"} till ${appState.customCountdownText}`;
 }

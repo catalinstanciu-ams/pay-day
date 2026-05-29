@@ -56,18 +56,31 @@
         aria-label="Current time, bookmarks, and payday countdown"
       >
         <div class="hero-content">
-          <h1 id="clock" class="clock" aria-live="polite">00:00:00</h1>
-          <p id="date-label" class="date-label">Loading date…</p>
+          <div class="hero-top">
+            <div class="time-block">
+              <div class="weather-column">
+                <div class="weather-block" aria-label="Current weather">
+                  <span id="weather-icon" class="weather-icon"></span>
+                  <span id="weather-temp" class="weather-temp"></span>
+                  <span id="weather-desc" class="weather-desc"></span>
+                </div>
+                <div id="weather-forecast" class="weather-forecast" aria-label="5-day forecast"></div>
+              </div>
+              <h1 id="clock" class="clock" aria-live="polite">00:00:00</h1>
+            </div>
+            <div class="counters-block">
+              <p id="date-label" class="date-label">Loading date…</p>
+              <p id="payday-status" class="payday-status">0 days till payday</p>
+              <p id="payday-target" class="payday-target">Next payday: --</p>
+              <p id="custom-countdown-status" class="payday-status">0 days till payday</p>
+            </div>
+          </div>
 
           <section id="bookmarks-section" class="bookmarks-section" aria-label="Bookmarks">
-            <p class="section-title">Bookmarks</p>
             <div id="bookmarks-root-links" class="bookmark-link-list" aria-label="Top-level bookmarks"></div>
             <div id="bookmarks-folders" class="bookmark-folder-grid" aria-label="Bookmark folders"></div>
             <p id="bookmarks-message" class="bookmarks-message" aria-live="polite"></p>
           </section>
-
-          <p id="payday-status" class="payday-status">0 days till payday</p>
-          <p id="payday-target" class="payday-target">Next payday: --</p>
 
           <section
             id="countdown"
@@ -103,6 +116,16 @@
       >
         <p class="settings-title">Settings</p>
         <form id="settings-form" class="settings-form">
+          <label class="field-label" for="weather-city-input">Weather city</label>
+          <div class="field-row">
+            <input
+              id="weather-city-input"
+              class="payday-input"
+              name="weatherCity"
+              type="text"
+              required
+            />
+          </div>
           <label class="field-label" for="payday-input">Recurring payday day</label>
           <div class="field-row">
             <input
@@ -118,8 +141,31 @@
             <button class="save-button" type="submit">Save</button>
           </div>
           <p class="helper-text">
-            Values above the last day of a month automatically clamp to that month’s final valid date.
+            Values above the last day of a month automatically clamp to that month's final valid date.
           </p>
+          <label class="field-label" for="custom-countdown-days-input">Custom countdown days</label>
+          <div class="field-row">
+            <input
+              id="custom-countdown-days-input"
+              class="payday-input"
+              name="customCountdownDays"
+              type="number"
+              min="1"
+              max="365"
+              inputmode="numeric"
+              required
+            />
+          </div>
+          <label class="field-label" for="custom-countdown-text-input">Custom countdown text</label>
+          <div class="field-row">
+            <input
+              id="custom-countdown-text-input"
+              class="payday-input"
+              name="customCountdownText"
+              type="text"
+              required
+            />
+          </div>
           <div class="clock-size-control" aria-label="Clock font size controls">
             <span class="field-label">Clock size</span>
             <div class="size-control-row">

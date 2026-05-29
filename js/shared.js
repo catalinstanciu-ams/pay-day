@@ -4,8 +4,11 @@ export const DEFAULT_PALETTE_INDEX = 0;
 export const DEFAULT_CLOCK_FONT_INDEX = 0;
 export const DEFAULT_CLOCK_SIZE_STEP = 4;
 export const DEFAULT_HIDE_SECONDS = false;
+export const DEFAULT_CUSTOM_COUNTDOWN_DAYS = 30;
+export const DEFAULT_CUSTOM_COUNTDOWN_TEXT = "payday";
 export const DEFAULT_IS_DYNAMIC_THEME = false;
 export const DEFAULT_DYNAMIC_HUE = 0;
+export const DEFAULT_WEATHER_CITY = "Bucharest";
 export const MIN_CLOCK_SIZE_STEP = 0;
 export const MAX_CLOCK_SIZE_STEP = 8;
 
@@ -78,6 +81,7 @@ export const elements = {
   dateLabel: document.getElementById("date-label"),
   paydayStatus: document.getElementById("payday-status"),
   paydayTarget: document.getElementById("payday-target"),
+  customCountdownStatus: document.getElementById("custom-countdown-status"),
   heroPanel: document.getElementById("hero-panel"),
   countdown: document.getElementById("countdown"),
   daysValue: document.getElementById("days-value"),
@@ -99,11 +103,18 @@ export const elements = {
   themeCancelButton: document.getElementById("theme-cancel-btn"),
   secondsToggle: document.getElementById("seconds-toggle"),
   paydayInput: document.getElementById("payday-input"),
+  customCountdownDaysInput: document.getElementById("custom-countdown-days-input"),
+  customCountdownTextInput: document.getElementById("custom-countdown-text-input"),
   saveMessage: document.getElementById("save-message"),
   settingsForm: document.getElementById("settings-form"),
   settingsPanel: document.getElementById("settings-panel"),
   settingsToggle: document.getElementById("settings-toggle"),
   themeToggle: document.getElementById("theme-toggle"),
+  weatherCityInput: document.getElementById("weather-city-input"),
+  weatherIcon: document.getElementById("weather-icon"),
+  weatherTemp: document.getElementById("weather-temp"),
+  weatherDesc: document.getElementById("weather-desc"),
+  weatherForecast: document.getElementById("weather-forecast"),
   bookmarksRootLinks: document.getElementById("bookmarks-root-links"),
   bookmarksFolders: document.getElementById("bookmarks-folders"),
   bookmarksMessage: document.getElementById("bookmarks-message")
@@ -143,7 +154,11 @@ export const appState = {
   clockSizeStep: DEFAULT_CLOCK_SIZE_STEP,
   hideSeconds: DEFAULT_HIDE_SECONDS,
   isDynamicTheme: DEFAULT_IS_DYNAMIC_THEME,
-  dynamicHue: DEFAULT_DYNAMIC_HUE
+  dynamicHue: DEFAULT_DYNAMIC_HUE,
+  customCountdownDays: DEFAULT_CUSTOM_COUNTDOWN_DAYS,
+  customCountdownText: DEFAULT_CUSTOM_COUNTDOWN_TEXT,
+  customCountdownTargetMs: 0,
+  weatherCity: DEFAULT_WEATHER_CITY
 };
 
 export function setSaveMessage(message) {
