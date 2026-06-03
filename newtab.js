@@ -3,14 +3,13 @@ import {
   DEFAULT_CLOCK_SIZE_STEP,
   DEFAULT_CUSTOM_COUNTDOWN_DAYS,
   DEFAULT_CUSTOM_COUNTDOWN_TEXT,
-  DEFAULT_DYNAMIC_HUE,
   DEFAULT_HIDE_SECONDS,
-  DEFAULT_IS_DYNAMIC_THEME,
   DEFAULT_PAYDAY,
   DEFAULT_THEME,
   DEFAULT_WEATHER_CITY,
   elements,
-  storage
+  storage,
+  setSaveMessage
 } from "./js/shared.js";
 import {
   clampPaydayDay,
@@ -29,23 +28,18 @@ import { initWeather, setWeatherCity } from "./js/weather.js";
 import {
   adjustClockSize,
   applyDynamicTheme,
-  clearDynamicTheme,
   cycleClockFont,
   normalizeClockFontIndex,
   normalizeClockSizeStep,
-  normalizeDynamicHue,
   normalizePaletteIndex,
   randomizeTheme,
   renderClockFont,
   renderClockSize,
   renderPalette,
   renderTheme,
-  setDynamicTheme,
   shiftPalette,
   toggleTheme
 } from "./js/theme.js";
-
-let themePreviewState = null;
 
 function toggleSettings(forceValue) {
   appState.settingsOpen = typeof forceValue === "boolean" ? forceValue : !appState.settingsOpen;
@@ -57,38 +51,28 @@ function renderSettingsPanel() {
   elements.settingsToggle.setAttribute("aria-expanded", String(appState.settingsOpen));
 }
 
-function restoreThemePreview() {
-  if (!themePreviewState) {
-    return;
+function getHueForPalette(index) {
+  if (index >= 10) {
+    return (index * 12) % 360;
   }
 
-  if (themePreviewState.isDynamicTheme) {
-    applyDynamicTheme(themePreviewState.dynamicHue);
-    return;
-  }
-
-  clearDynamicTheme();
-  renderPalette();
+  return 0;
 }
 
 function closeThemeCustomization(restorePreview) {
   if (restorePreview) {
-    restoreThemePreview();
+    renderPalette();
   }
 
   elements.themeCustomizePopup.hidden = true;
-  themePreviewState = null;
 }
 
 function openThemeCustomization() {
-  themePreviewState = {
-    isDynamicTheme: appState.isDynamicTheme,
-    dynamicHue: appState.dynamicHue
-  };
+  const hue = getHueForPalette(appState.paletteIndex);
 
-  elements.themeHueSlider.value = String(appState.dynamicHue);
-  elements.themeHueValue.textContent = `${appState.dynamicHue} deg`;
-  applyDynamicTheme(appState.dynamicHue);
+  elements.themeHueSlider.value = String(hue);
+  elements.themeHueValue.textContent = `${hue} deg`;
+  applyDynamicTheme(hue);
   elements.themeCustomizePopup.hidden = false;
 }
 
@@ -100,8 +84,6 @@ async function initialize() {
     "clockFontIndex",
     "clockSizeStep",
     "hideSeconds",
-    "isDynamicTheme",
-    "dynamicHue",
     "customCountdownDays",
     "customCountdownText",
     "customCountdownTargetMs",
@@ -114,8 +96,6 @@ async function initialize() {
   appState.clockFontIndex = normalizeClockFontIndex(saved.clockFontIndex);
   appState.clockSizeStep = normalizeClockSizeStep(saved.clockSizeStep, DEFAULT_CLOCK_SIZE_STEP);
   appState.hideSeconds = normalizeHideSeconds(saved.hideSeconds ?? DEFAULT_HIDE_SECONDS);
-  appState.isDynamicTheme = saved.isDynamicTheme === true ? true : DEFAULT_IS_DYNAMIC_THEME;
-  appState.dynamicHue = normalizeDynamicHue(saved.dynamicHue, DEFAULT_DYNAMIC_HUE);
   appState.customCountdownDays = normalizeCustomCountdownDays(saved.customCountdownDays ?? DEFAULT_CUSTOM_COUNTDOWN_DAYS);
   appState.customCountdownText = normalizeCustomCountdownText(saved.customCountdownText ?? DEFAULT_CUSTOM_COUNTDOWN_TEXT);
   appState.weatherCity = saved.weatherCity || DEFAULT_WEATHER_CITY;
@@ -135,12 +115,6 @@ async function initialize() {
   }
   renderTheme(appState.theme);
   renderPalette();
-
-  if (appState.isDynamicTheme) {
-    applyDynamicTheme(appState.dynamicHue);
-  } else {
-    clearDynamicTheme();
-  }
 
   renderClockFont();
   renderClockSize();
@@ -188,14 +162,19 @@ async function initialize() {
   });
 
   elements.themeHueSlider.addEventListener("input", () => {
-    const hue = normalizeDynamicHue(elements.themeHueSlider.value, appState.dynamicHue);
+    const hue = ((Number.parseInt(elements.themeHueSlider.value, 10) % 360) + 360) % 360;
     elements.themeHueValue.textContent = `${hue} deg`;
     applyDynamicTheme(hue);
   });
 
   elements.themeApplyButton.addEventListener("click", async () => {
-    const hue = normalizeDynamicHue(elements.themeHueSlider.value, appState.dynamicHue);
-    await setDynamicTheme(hue);
+    const hue = ((Number.parseInt(elements.themeHueSlider.value, 10) % 360) + 360) % 360;
+    const paletteIndex = 10 + Math.round(hue / 12);
+
+    appState.paletteIndex = paletteIndex % 40;
+    renderPalette();
+    setSaveMessage(`Colors: ${appState.paletteIndex >= 10 ? `Hue ${hue}deg` : appState.paletteIndex}.`);
+    await storage.set({ paletteIndex: appState.paletteIndex });
     closeThemeCustomization(false);
   });
 

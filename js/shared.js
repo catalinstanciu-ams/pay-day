@@ -6,8 +6,6 @@ export const DEFAULT_CLOCK_SIZE_STEP = 4;
 export const DEFAULT_HIDE_SECONDS = false;
 export const DEFAULT_CUSTOM_COUNTDOWN_DAYS = 30;
 export const DEFAULT_CUSTOM_COUNTDOWN_TEXT = "payday";
-export const DEFAULT_IS_DYNAMIC_THEME = false;
-export const DEFAULT_DYNAMIC_HUE = 0;
 export const DEFAULT_WEATHER_CITY = "Bucharest";
 export const MIN_CLOCK_SIZE_STEP = 0;
 export const MAX_CLOCK_SIZE_STEP = 8;
@@ -154,8 +152,6 @@ export const appState = {
   clockFontIndex: DEFAULT_CLOCK_FONT_INDEX,
   clockSizeStep: DEFAULT_CLOCK_SIZE_STEP,
   hideSeconds: DEFAULT_HIDE_SECONDS,
-  isDynamicTheme: DEFAULT_IS_DYNAMIC_THEME,
-  dynamicHue: DEFAULT_DYNAMIC_HUE,
   customCountdownDays: DEFAULT_CUSTOM_COUNTDOWN_DAYS,
   customCountdownText: DEFAULT_CUSTOM_COUNTDOWN_TEXT,
   customCountdownTargetMs: 0,

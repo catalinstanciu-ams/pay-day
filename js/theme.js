@@ -2,7 +2,6 @@ import {
   appState,
   CLOCK_FONT_LABELS,
   DEFAULT_CLOCK_FONT_INDEX,
-  DEFAULT_DYNAMIC_HUE,
   DEFAULT_PALETTE_INDEX,
   DEFAULT_THEME,
   elements,
@@ -13,7 +12,9 @@ import {
   setSaveMessage
 } from "./shared.js";
 
-const DYNAMIC_THEME_PROPERTIES = [
+const CSS_PALETTE_COUNT = 10;
+
+const GENERATED_PROPERTIES = [
   "--bg-base",
   "--bg-depth",
   "--bg-accent",
@@ -34,90 +35,96 @@ const DYNAMIC_THEME_PROPERTIES = [
   "--grid-line"
 ];
 
+function hslToHex(h, s, l) {
+  s /= 100;
+  l /= 100;
+  const a = s * Math.min(l, 1 - l);
+  const f = (n) => {
+    const k = (n + h / 30) % 12;
+    const color = l - a * Math.max(Math.min(k - 3, 9 - k, 1), -1);
+    return Math.round(255 * color).toString(16).padStart(2, "0");
+  };
+  return `#${f(0)}${f(8)}${f(4)}`;
+}
+
+function generatePaletteVars(hue) {
+  const h = ((hue % 360) + 360) % 360;
+  const isDark = appState.theme === "dark";
+
+  if (isDark) {
+    return {
+      "--bg-base": hslToHex(h, 20, 5),
+      "--bg-depth": hslToHex(h, 20, 15),
+      "--bg-accent": `${hslToHex(h, 70, 60)}2e`,
+      "--bg-accent-2": `${hslToHex(h, 70, 50)}1f`,
+      "--panel-bg": `${hslToHex(h, 20, 10)}b8`,
+      "--panel-border": `${hslToHex(h, 70, 60)}2e`,
+      "--panel-shadow": "0 20px 60px rgba(0, 0, 0, 0.35)",
+      "--text-main": hslToHex(h, 20, 95),
+      "--text-muted": `${hslToHex(h, 20, 90)}b8`,
+      "--text-soft": `${hslToHex(h, 20, 90)}8a`,
+      "--accent": hslToHex(h, 70, 60),
+      "--accent-strong": hslToHex(h, 70, 50),
+      "--input-bg": "rgba(255, 255, 255, 0.07)",
+      "--button-bg": `${hslToHex(h, 70, 60)}2e`,
+      "--button-hover": `${hslToHex(h, 70, 60)}47`,
+      "--card-bg": `${hslToHex(h, 20, 15)}d1`,
+      "--card-border": `${hslToHex(h, 70, 60)}24`,
+      "--grid-line": `${hslToHex(h, 70, 60)}4d`
+    };
+  }
+
+  return {
+    "--bg-base": hslToHex(h, 20, 98),
+    "--bg-depth": hslToHex(h, 20, 90),
+    "--bg-accent": `${hslToHex(h, 70, 60)}47`,
+    "--bg-accent-2": `${hslToHex(h, 70, 50)}2e`,
+    "--panel-bg": "rgba(255, 255, 255, 0.76)",
+    "--panel-border": `${hslToHex(h, 20, 20)}1f`,
+    "--panel-shadow": "0 24px 60px rgba(0, 0, 0, 0.18)",
+    "--text-main": hslToHex(h, 20, 20),
+    "--text-muted": `${hslToHex(h, 20, 30)}b8`,
+    "--text-soft": `${hslToHex(h, 20, 30)}85`,
+    "--accent": hslToHex(h, 70, 40),
+    "--accent-strong": hslToHex(h, 70, 30),
+    "--input-bg": `${hslToHex(h, 20, 20)}0d`,
+    "--button-bg": `${hslToHex(h, 70, 40)}1f`,
+    "--button-hover": `${hslToHex(h, 70, 40)}2e`,
+    "--card-bg": "rgba(255, 255, 255, 0.72)",
+    "--card-border": `${hslToHex(h, 20, 20)}1a`,
+    "--grid-line": `${hslToHex(h, 20, 50)}4d`
+  };
+}
+
+function applyGeneratedPalette(index) {
+  const hue = (index * 12) % 360;
+  const vars = generatePaletteVars(hue);
+
+  for (const [property, value] of Object.entries(vars)) {
+    document.body.style.setProperty(property, value);
+  }
+}
+
+function clearGeneratedPalette() {
+  GENERATED_PROPERTIES.forEach((property) => {
+    document.body.style.removeProperty(property);
+  });
+}
+
 export function renderTheme(theme) {
   document.body.dataset.theme = theme;
   elements.themeToggle.textContent = theme === "dark" ? "Light mode" : "Dark mode";
 }
 
-export function normalizeDynamicHue(value, fallbackHue = DEFAULT_DYNAMIC_HUE) {
-  const hue = Number.parseInt(value, 10);
-
-  if (Number.isNaN(hue)) {
-    return fallbackHue;
-  }
-
-  return ((hue % 360) + 360) % 360;
-}
-
 export function applyDynamicTheme(hue) {
-  const normalizedHue = normalizeDynamicHue(hue);
-  const isDark = appState.theme === "dark";
+  const normalizedHue = ((Number.parseInt(hue, 10) % 360) + 360) % 360;
+  const vars = generatePaletteVars(normalizedHue);
 
-  if (isDark) {
-    document.body.style.setProperty("--bg-base", `hsl(${normalizedHue}, 20%, 5%)`);
-    document.body.style.setProperty("--bg-depth", `hsl(${normalizedHue}, 20%, 15%)`);
-    document.body.style.setProperty("--bg-accent", `hsla(${normalizedHue}, 70%, 60%, 0.18)`);
-    document.body.style.setProperty("--bg-accent-2", `hsla(${normalizedHue}, 70%, 50%, 0.12)`);
-    document.body.style.setProperty("--panel-bg", `hsla(${normalizedHue}, 20%, 10%, 0.72)`);
-    document.body.style.setProperty("--panel-border", `hsla(${normalizedHue}, 70%, 60%, 0.18)`);
-    document.body.style.setProperty("--panel-shadow", "0 20px 60px rgba(0, 0, 0, 0.35)");
-    document.body.style.setProperty("--text-main", `hsl(${normalizedHue}, 20%, 95%)`);
-    document.body.style.setProperty("--text-muted", `hsla(${normalizedHue}, 20%, 90%, 0.72)`);
-    document.body.style.setProperty("--text-soft", `hsla(${normalizedHue}, 20%, 90%, 0.54)`);
-    document.body.style.setProperty("--accent", `hsl(${normalizedHue}, 70%, 60%)`);
-    document.body.style.setProperty("--accent-strong", `hsl(${normalizedHue}, 70%, 50%)`);
-    document.body.style.setProperty("--input-bg", "rgba(255, 255, 255, 0.07)");
-    document.body.style.setProperty("--button-bg", `hsla(${normalizedHue}, 70%, 60%, 0.18)`);
-    document.body.style.setProperty("--button-hover", `hsla(${normalizedHue}, 70%, 60%, 0.28)`);
-    document.body.style.setProperty("--card-bg", `hsla(${normalizedHue}, 20%, 15%, 0.82)`);
-    document.body.style.setProperty("--card-border", `hsla(${normalizedHue}, 70%, 60%, 0.14)`);
-    document.body.style.setProperty("--grid-line", `hsla(${normalizedHue}, 70%, 60%, 0.3)`);
-  } else {
-    document.body.style.setProperty("--bg-base", `hsl(${normalizedHue}, 20%, 98%)`);
-    document.body.style.setProperty("--bg-depth", `hsl(${normalizedHue}, 20%, 90%)`);
-    document.body.style.setProperty("--bg-accent", `hsla(${normalizedHue}, 70%, 60%, 0.28)`);
-    document.body.style.setProperty("--bg-accent-2", `hsla(${normalizedHue}, 70%, 50%, 0.18)`);
-    document.body.style.setProperty("--panel-bg", "rgba(255, 255, 255, 0.76)");
-    document.body.style.setProperty("--panel-border", `hsla(${normalizedHue}, 20%, 20%, 0.12)`);
-    document.body.style.setProperty("--panel-shadow", "0 24px 60px rgba(0, 0, 0, 0.18)");
-    document.body.style.setProperty("--text-main", `hsl(${normalizedHue}, 20%, 20%)`);
-    document.body.style.setProperty("--text-muted", `hsla(${normalizedHue}, 20%, 30%, 0.72)`);
-    document.body.style.setProperty("--text-soft", `hsla(${normalizedHue}, 20%, 30%, 0.52)`);
-    document.body.style.setProperty("--accent", `hsl(${normalizedHue}, 70%, 40%)`);
-    document.body.style.setProperty("--accent-strong", `hsl(${normalizedHue}, 70%, 30%)`);
-    document.body.style.setProperty("--input-bg", `hsla(${normalizedHue}, 20%, 20%, 0.05)`);
-    document.body.style.setProperty("--button-bg", `hsla(${normalizedHue}, 70%, 40%, 0.12)`);
-    document.body.style.setProperty("--button-hover", `hsla(${normalizedHue}, 70%, 40%, 0.18)`);
-    document.body.style.setProperty("--card-bg", "rgba(255, 255, 255, 0.72)");
-    document.body.style.setProperty("--card-border", `hsla(${normalizedHue}, 20%, 20%, 0.1)`);
-    document.body.style.setProperty("--grid-line", `hsla(${normalizedHue}, 20%, 50%, 0.3)`);
+  for (const [property, value] of Object.entries(vars)) {
+    document.body.style.setProperty(property, value);
   }
 
   return normalizedHue;
-}
-
-export function clearDynamicTheme() {
-  DYNAMIC_THEME_PROPERTIES.forEach((property) => {
-    document.body.style.removeProperty(property);
-  });
-}
-
-export async function setDynamicTheme(hue, message = null) {
-  const normalizedHue = applyDynamicTheme(hue);
-
-  appState.dynamicHue = normalizedHue;
-  appState.isDynamicTheme = true;
-  setSaveMessage(message ?? `Colors: Custom ${normalizedHue}deg.`);
-
-  await storage.set({
-    isDynamicTheme: true,
-    dynamicHue: normalizedHue
-  });
-}
-
-export async function randomizeTheme() {
-  const hue = Math.floor(Math.random() * 360);
-  await setDynamicTheme(hue, `Colors: Random ${hue}deg.`);
 }
 
 export function normalizePaletteIndex(value) {
@@ -131,6 +138,12 @@ export function normalizePaletteIndex(value) {
 
 export function renderPalette() {
   document.body.dataset.palette = String(appState.paletteIndex);
+
+  if (appState.paletteIndex >= CSS_PALETTE_COUNT) {
+    applyGeneratedPalette(appState.paletteIndex);
+  } else {
+    clearGeneratedPalette();
+  }
 }
 
 export function normalizeClockFontIndex(value) {
@@ -168,10 +181,7 @@ export function renderClockSize() {
 export async function toggleTheme() {
   appState.theme = appState.theme === "dark" ? "light" : DEFAULT_THEME;
   renderTheme(appState.theme);
-
-  if (appState.isDynamicTheme) {
-    applyDynamicTheme(appState.dynamicHue);
-  }
+  renderPalette();
 
   await storage.set({ theme: appState.theme });
 }
@@ -179,16 +189,21 @@ export async function toggleTheme() {
 export async function shiftPalette(delta) {
   const count = PALETTE_LABELS.length;
 
-  appState.isDynamicTheme = false;
   appState.paletteIndex = ((appState.paletteIndex + delta) % count + count) % count;
-  clearDynamicTheme();
   renderPalette();
   setSaveMessage(`Colors: ${PALETTE_LABELS[appState.paletteIndex]}.`);
 
-  await storage.set({
-    isDynamicTheme: false,
-    paletteIndex: appState.paletteIndex
-  });
+  await storage.set({ paletteIndex: appState.paletteIndex });
+}
+
+export async function randomizeTheme() {
+  const index = Math.floor(Math.random() * PALETTE_LABELS.length);
+
+  appState.paletteIndex = index;
+  renderPalette();
+  setSaveMessage(`Colors: ${PALETTE_LABELS[index]}.`);
+
+  await storage.set({ paletteIndex: index });
 }
 
 export async function cycleClockFont() {
