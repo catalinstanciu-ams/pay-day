@@ -105,6 +105,14 @@ export function initWeather() {
   fetchWeather();
   if (weatherTimer) clearInterval(weatherTimer);
   weatherTimer = setInterval(fetchWeather, FETCH_INTERVAL_MS);
+
+  elements.weatherColumn.addEventListener("click", () => {
+    const city = appState.weatherCity || "Bucharest";
+    window.open(
+      `https://www.accuweather.com/en/search-locations?query=${encodeURIComponent(city)}`,
+      "_blank"
+    );
+  });
 }
 
 export function setWeatherCity() {

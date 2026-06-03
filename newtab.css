@@ -196,6 +196,15 @@ body[data-clock-font="4"] .clock {
   gap: 18px;
 }
 
+.weather-column {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  cursor: pointer;
+}
+
 .weather-block {
   display: flex;
   align-items: center;
@@ -622,15 +631,7 @@ body[data-clock-font="4"] .clock {
 }
 
 @media (max-width: 480px) {
-.weather-column {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-}
-
-.weather-block {
+  .weather-block {
     display: none;
   }
 

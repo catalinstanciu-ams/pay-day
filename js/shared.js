@@ -110,6 +110,7 @@ export const elements = {
   settingsPanel: document.getElementById("settings-panel"),
   settingsToggle: document.getElementById("settings-toggle"),
   themeToggle: document.getElementById("theme-toggle"),
+  weatherColumn: document.getElementById("weather-column"),
   weatherCityInput: document.getElementById("weather-city-input"),
   weatherIcon: document.getElementById("weather-icon"),
   weatherTemp: document.getElementById("weather-temp"),
